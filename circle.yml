@@ -1,7 +1,27 @@
+machine:
+  timezone:
+    America/New_York
+
+  java:
+    version: oraclejdk8
+
+  services:
+    - rabbitmq-server
+
+  environment:
+    AMQP_URL: amqp://localhost:5672
+
 dependencies:
-  pre:
-    - echo 'deb http://www.rabbitmq.com/debian/ testing main' | sudo tee /etc/apt/sources.list.d/rabbitmq.list
-    - wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
-    - sudo apt-get update
-    - sudo apt-get install rabbitmq-server
-    - sudo service rabbitmq-server start
+  override:
+    - mvn install -DskipTests
+
+general:
+  branches:
+    only:
+      - master
+      - develop
+
+test:
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
