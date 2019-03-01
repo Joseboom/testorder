@@ -10,13 +10,14 @@ module.exports.publish = function (ex, msgKey, msgPayload) {
             ch.assertExchange(ex, 'direct', { durable: true });
             ch.publish(ex, msgKey, Buffer.from(msgPayload));
             console.log('[x]', msgKey);
+            ON_DEATH(function (signal, err) {
+                console.log('clean');
+                setTimeout(() => { conn.close(); process.exit(0) });
+            })
             return '';
 
         });
-        ON_DEATH(function (signal, err) {
-            console.log('clean');
-            setTimeout(() => { conn.close(); process.exit(0) });
-        })
+
     });
 }
 //ex คือ สถานที่ qname คือ ชื่อที่จะส่งไป ,msgKey คือ คีย์ที่จะระบุไปให้ใครเลย ,invkFn คือ return ดาต้า
